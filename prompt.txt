@@ -1,0 +1,160 @@
+Context:
+- backend-service.txt is already provided.
+- It contains all enums, request DTOs, update DTOs, response DTOs, endpoints, request params, path variables, request headers, request/response mappings, and API information extracted from the backend.
+- Current folder contains a freshly created React application.
+ 
+Task:
+Build a complete production-ready React frontend that integrates with the backend described in backend-service.txt.
+ 
+Requirements:
+- Use React + React Router.
+- Follow component-based architecture.
+- Maximize reusability and separation of concerns.
+- Create reusable:
+  - Layouts
+  - Forms
+  - Tables
+  - Modals
+  - Input components
+  - API service layer
+  - Hooks
+  - Constants
+  - Utility functions
+- Generate folder structure before implementation.
+- Reuse enums from backend wherever applicable.
+- Create API clients for every endpoint from backend-service.txt.
+- Correctly handle:
+  - Path variables
+  - Request params
+  - Request headers
+  - Request body DTOs
+  - Response DTOs
+- Implement CRUD screens for all supported modules.
+- Use environment variables for API base URL.
+- Add loading, error handling, validation, empty states, and success notifications.
+- Keep UI clean, responsive, and easy to extend.
+- Avoid duplicate code.
+- Use shared components whenever possible.
+ 
+Output Order:
+1. Proposed folder structure
+2. Application architecture explanation (brief)
+3. Routing structure
+4. Shared components
+5. API layer
+6. Hooks
+7. Page-wise implementation
+8. Complete code file-by-file
+ 
+Rules:
+- Analyze backend-service.txt as the single source of truth.
+- Do not make assumptions if backend-service.txt already contains the information.
+- Ensure every endpoint has corresponding frontend integration.
+- Prefer reusable generic components over page-specific implementations.
+- Generate code that can run immediately after copy-paste in the React project.
+- Keep code enterprise-grade, scalable, and maintainable.
+
+update this prompt tell to use bootstrap and minimal usage of custom inline css with responsiveness and correct data display and payload, response format would be {
+    "success": true,
+    "message": "Team created successfully",
+    "data": {
+        "teamId": 2,
+        "teamName": "Digital Transformation Team 2",
+        "teamLeadId": 4,
+        "teamLeadName": "Neha Patil"
+    },
+    "timestamp": "2026-09-25T16:50:12.5132972"
+}
+
+
+{
+    "success": true,
+    "message": "Teams fetched successfully",
+    "data": {
+        "content": [
+            {
+                "teamId": 1,
+                "teamName": "Digital Transformation Team",
+                "teamLeadId": 5,
+                "teamLeadName": "Sanket Kulkarni"
+            },
+            {
+                "teamId": 2,
+                "teamName": "Digital Transformation Team 2",
+                "teamLeadId": 4,
+                "teamLeadName": "Neha Patil"
+            }
+        ],
+        "pageable": {
+            "pageNumber": 0,
+            "pageSize": 10,
+            "sort": {
+                "empty": false,
+                "unsorted": false,
+                "sorted": true
+            },
+            "offset": 0,
+            "paged": true,
+            "unpaged": false
+        },
+        "last": true,
+        "totalElements": 2,
+        "totalPages": 1,
+        "size": 10,
+        "number": 0,
+        "sort": {
+            "empty": false,
+            "unsorted": false,
+            "sorted": true
+        },
+        "first": true,
+        "numberOfElements": 2,
+        "empty": false
+    },
+    "timestamp": "2026-09-25T16:50:33.6112527"
+}{
+    "success": true,
+    "message": "Teams fetched successfully",
+    "data": {
+        "content": [
+            {
+                "teamId": 1,
+                "teamName": "Digital Transformation Team",
+                "teamLeadId": 5,
+                "teamLeadName": "Sanket Kulkarni"
+            },
+            {
+                "teamId": 2,
+                "teamName": "Digital Transformation Team 2",
+                "teamLeadId": 4,
+                "teamLeadName": "Neha Patil"
+            }
+        ],
+        "pageable": {
+            "pageNumber": 0,
+            "pageSize": 10,
+            "sort": {
+                "empty": false,
+                "unsorted": false,
+                "sorted": true
+            },
+            "offset": 0,
+            "paged": true,
+            "unpaged": false
+        },
+        "last": true,
+        "totalElements": 2,
+        "totalPages": 1,
+        "size": 10,
+        "number": 0,
+        "sort": {
+            "empty": false,
+            "unsorted": false,
+            "sorted": true
+        },
+        "first": true,
+        "numberOfElements": 2,
+        "empty": false
+    },
+    "timestamp": "2026-09-25T16:51:06.7539318"
+}
