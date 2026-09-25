@@ -52,6 +52,17 @@ Values: DRAFT, SUBMITTED, APPROVED, REJECTED
 ================================================================================
 2. CREATE DTOs
 ================================================================================
+DTO:LoginRequest
+Fields:
+- email: String
+- password : String
+
+DTO: ChangePasswordRequest
+Fields :
+-currentPassword:String
+-newPassword:String
+- confirmPassword:String
+
 
 DTO: UserCreateRequest
 Fields:

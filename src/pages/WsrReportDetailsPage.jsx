@@ -1,0 +1,8 @@
+import { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { getWsrDetails } from '../api/modules/wsrReportsApi'
+import { unwrap } from '../api/apiResponse'
+import { useApi } from '../hooks/useApi'
+import { Feedback, Loading } from '../components/common/Feedback'
+export default function WsrReportDetailsPage() { const { reportId } = useParams(); const request = useApi(); const [report, setReport] = useState(null); // eslint-disable-next-line react-hooks/exhaustive-deps
+	useEffect(() => { request.run(() => getWsrDetails(reportId)).then(({ response }) => setReport(unwrap(response))).catch(() => {}) }, [reportId, request.run]); if (request.loading) return <Loading />; return <section><p className="eyebrow mb-1">WSR report details</p><h1 className="h2">{report?.projectName || 'Report'}</h1><Feedback error={request.error} /><div className="row g-3 mt-2">{[['Status', 'status'], ['Reporting week', 'reportingWeek'], ['Submitted by', 'submittedBy'], ['Approved by', 'approvedBy'], ['Achievements', 'totalAchievements'], ['Risks', 'totalRisks'], ['Blockers', 'totalBlockers'], ['High risks', 'highRiskCount'], ['Open blockers', 'openBlockerCount']].map(([label, key]) => <div className="col-6 col-md-4" key={key}><div className="metric-card"><span className="text-secondary small">{label}</span><strong>{report?.[key] ?? '—'}</strong></div></div>)}</div></section> }

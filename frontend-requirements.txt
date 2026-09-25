@@ -1,0 +1,1369 @@
+ Task: Build Complete Production-Ready React Frontend
+
+ Context
+
+ backend-service.txt is already provided in the current project.
+ backend-service.txt is the single source of truth for the backend.
+ It contains:
+
+   All enums
+   Request DTOs
+   Update DTOs
+   Response DTOs
+   Endpoints
+   HTTP methods
+   Request parameters
+   Path variables
+   Request headers
+   Request/response mappings
+   API information
+   Validation requirements, where available
+ The current folder contains a freshly created React application.
+
+ Primary Objective
+
+Build a complete, production-ready, scalable React frontend that integrates correctly with every API documented in backend-service.txt.
+
+The frontend must be immediately runnable after copying the generated files into the React project.
+
+---
+
+ 1. Technology Requirements
+
+Use:
+
+ React
+ React Router
+ Bootstrap
+ Axios or an equivalent clean HTTP client
+ Functional components
+ React Hooks
+ Component-based architecture
+
+ UI Framework
+
+Use Bootstrap as the primary styling system.
+
+Prefer:
+
+ Bootstrap grid
+ Bootstrap utilities
+ Bootstrap forms
+ Bootstrap buttons
+ Bootstrap cards
+ Bootstrap tables
+ Bootstrap modals
+ Bootstrap alerts
+ Bootstrap badges
+ Bootstrap pagination
+ Bootstrap spinners
+ Bootstrap navbar/sidebar utilities
+
+Avoid unnecessarily creating custom CSS when Bootstrap can achieve the same result.
+
+ Custom CSS
+
+Use minimal custom CSS only when Bootstrap cannot reasonably achieve the required UI/UX.
+
+Do NOT use large page-specific CSS files or excessive inline styles.
+
+Avoid:
+
+jsx
+style={{ marginTop: "20px", width: "100%", ... }}
+
+
+when an equivalent Bootstrap utility exists:
+
+jsx
+className="mt-3 w-100"
+
+
+Use Bootstrap classes wherever possible.
+
+---
+
+ 2. Responsive Design
+
+The entire application must be responsive.
+
+It must work properly on:
+
+ Desktop
+ Laptop
+ Tablet
+ Mobile
+
+Use Bootstrap responsive utilities and breakpoints.
+
+Examples:
+
+text
+container-fluid
+row
+col-12
+col-md-6
+col-lg-4
+table-responsive
+d-none d-md-block
+
+
+Tables must use:
+
+html
+<div className="table-responsive">
+
+
+Forms should stack appropriately on smaller screens.
+
+Navigation/sidebar should also work properly on mobile.
+
+Do not create fixed-width layouts that break on smaller screens.
+
+---
+
+ 3. IMPORTANT: Backend Response Wrapper
+
+The backend APIs use a common response structure.
+
+For example, a successful create API returns:
+
+json
+{
+    "success": true,
+    "message": "Team created successfully",
+    "data": {
+        "teamId": 2,
+        "teamName": "Digital Transformation Team 2",
+        "teamLeadId": 4,
+        "teamLeadName": "Neha Patil"
+    },
+    "timestamp": "2026-09-25T16:50:12.5132972"
+}
+
+
+A list API can return:
+
+json
+{
+    "success": true,
+    "message": "Teams fetched successfully",
+    "data": {
+        "content": [
+            {
+                "teamId": 1,
+                "teamName": "Digital Transformation Team",
+                "teamLeadId": 5,
+                "teamLeadName": "Sanket Kulkarni"
+            },
+            {
+                "teamId": 2,
+                "teamName": "Digital Transformation Team 2",
+                "teamLeadId": 4,
+                "teamLeadName": "Neha Patil"
+            }
+        ],
+        "pageable": {
+            "pageNumber": 0,
+            "pageSize": 10,
+            "sort": {
+                "empty": false,
+                "unsorted": false,
+                "sorted": true
+            },
+            "offset": 0,
+            "paged": true,
+            "unpaged": false
+        },
+        "last": true,
+        "totalElements": 2,
+        "totalPages": 1,
+        "size": 10,
+        "number": 0,
+        "sort": {
+            "empty": false,
+            "unsorted": false,
+            "sorted": true
+        },
+        "first": true,
+        "numberOfElements": 2,
+        "empty": false
+    },
+    "timestamp": "2026-09-25T16:50:33.6112527"
+}
+
+
+ Response Handling Requirements
+
+The frontend must correctly understand that the actual API payload is wrapped inside:
+
+javascript
+response.data
+
+
+and the backend's business data is inside:
+
+javascript
+response.data.data
+
+
+For example:
+
+javascript
+const response = await api.get("/teams");
+
+const backendResponse = response.data;
+
+const teams = backendResponse.data.content;
+
+
+Do NOT incorrectly assume that:
+
+javascript
+response.data.content
+
+
+is the backend list.
+
+Create reusable response handling utilities/types so this logic is not duplicated throughout the application.
+
+---
+
+ 4. Generic API Response Model
+
+Create reusable models/interfaces/types for the backend response format.
+
+Conceptually support:
+
+javascript
+{
+    success: boolean,
+    message: string,
+    data: T,
+    timestamp: string
+}
+
+
+Use a generic structure such as:
+
+javascript
+ApiResponse<T>
+
+
+where appropriate.
+
+For paginated APIs, support the Spring-style structure:
+
+javascript
+PageResponse<T>
+
+
+with:
+
+javascript
+{
+    content: T[],
+    pageable: {...},
+    last: boolean,
+    totalElements: number,
+    totalPages: number,
+    size: number,
+    number: number,
+    first: boolean,
+    numberOfElements: number,
+    empty: boolean
+}
+
+
+Do not flatten or alter backend data unnecessarily.
+
+---
+
+ 5. Correct Data Display
+
+The frontend must display the actual response fields returned by the backend.
+
+For example, if the backend returns:
+
+json
+{
+    "teamId": 2,
+    "teamName": "Digital Transformation Team 2",
+    "teamLeadId": 4,
+    "teamLeadName": "Neha Patil"
+}
+
+
+the UI should correctly display:
+
+| Team ID | Team Name                     | Team Lead ID | Team Lead  |
+| ------- | ----------------------------- | ------------ | ---------- |
+| 2       | Digital Transformation Team 2 | 4            | Neha Patil |
+
+Do not invent frontend fields.
+
+Do not rename backend fields unless there is a clear presentation reason.
+
+When displaying related entity information, use the fields already supplied by the backend response instead of unnecessarily making additional API calls.
+
+Example:
+
+javascript
+team.teamLeadName
+
+
+should be displayed directly if provided by the backend.
+
+---
+
+ 6. Correct Request Payloads
+
+Every API request must use the exact request DTO structure documented in backend-service.txt.
+
+For example, if the backend expects:
+
+json
+{
+    "teamName": "Digital Transformation Team 2",
+    "teamLeadId": 4
+}
+
+
+send exactly that structure.
+
+Do NOT send:
+
+json
+{
+    "name": "...",
+    "lead": "..."
+}
+
+
+Do not add frontend-only fields to API payloads.
+
+Do not send:
+
+ IDs unnecessarily
+ labels instead of IDs
+ UI state
+ pagination objects
+ unrelated fields
+
+unless backend-service.txt explicitly requires them.
+
+---
+
+ 7. Path Variables, Query Parameters and Headers
+
+Every API client must correctly handle:
+
+ Path variables
+
+Example:
+
+text
+GET /teams/{teamId}
+
+
+should generate:
+
+javascript
+api.get(/teams/${teamId})
+
+
+ Query/request parameters
+
+Example:
+
+text
+?page=0&size=10&sort=teamName,asc
+
+
+should use Axios params:
+
+javascript
+api.get("/teams", {
+    params: {
+        page,
+        size,
+        sort
+    }
+});
+
+
+Do not manually construct query strings unless necessary.
+
+ Headers
+
+If backend-service.txt specifies headers, implement them correctly.
+
+Examples may include:
+
+text
+Authorization
+Content-Type
+Accept
+Custom headers
+
+
+Do not invent headers that are not documented.
+
+---
+
+ 8. Folder Structure First
+
+Before writing implementation code, provide the proposed folder structure.
+
+Use a scalable structure similar to:
+
+text
+src/
+├── api/
+│   ├── axiosClient.js
+│   ├── apiResponse.js
+│   └── modules/
+│       ├── teamApi.js
+│       ├── userApi.js
+│       └── ...
+│
+├── assets/
+│
+├── components/
+│   ├── common/
+│   │   ├── Button.jsx
+│   │   ├── Input.jsx
+│   │   ├── Select.jsx
+│   │   ├── TextArea.jsx
+│   │   ├── LoadingSpinner.jsx
+│   │   ├── ErrorMessage.jsx
+│   │   ├── EmptyState.jsx
+│   │   ├── ConfirmModal.jsx
+│   │   ├── DataTable.jsx
+│   │   ├── Pagination.jsx
+│   │   └── ...
+│   │
+│   ├── layout/
+│   │   ├── AppLayout.jsx
+│   │   ├── Navbar.jsx
+│   │   ├── Sidebar.jsx
+│   │   └── Footer.jsx
+│   │
+│   └── forms/
+│       ├── FormInput.jsx
+│       ├── FormSelect.jsx
+│       └── ...
+│
+├── constants/
+│   ├── routes.js
+│   ├── apiConstants.js
+│   └── enums.js
+│
+├── hooks/
+│   ├── useApi.js
+│   ├── usePagination.js
+│   ├── useModal.js
+│   └── ...
+│
+├── pages/
+│   ├── Dashboard/
+│   ├── Teams/
+│   │   ├── TeamList.jsx
+│   │   ├── TeamCreate.jsx
+│   │   ├── TeamEdit.jsx
+│   │   └── TeamDetails.jsx
+│   └── ...
+│
+├── routes/
+│   └── AppRoutes.jsx
+│
+├── utils/
+│   ├── validation.js
+│   ├── formatters.js
+│   ├── errorHandler.js
+│   └── responseUtils.js
+│
+├── App.jsx
+├── main.jsx
+└── index.css
+
+
+Modify this structure based on the actual modules and APIs found in backend-service.txt.
+
+Do not create unnecessary folders or files.
+
+---
+
+ 9. Application Architecture
+
+Use a clean layered architecture:
+
+text
+UI/Page
+   ↓
+Reusable Components
+   ↓
+Custom Hooks
+   ↓
+API Service
+   ↓
+Axios Client
+   ↓
+Backend API
+
+
+Responsibilities must remain separated.
+
+ Pages
+
+Pages handle:
+
+ Page-level state
+ Calling hooks
+ Combining components
+ Navigation
+ Page-specific behavior
+
+ Components
+
+Components handle:
+
+ UI
+ User interaction
+ Form fields
+ Tables
+ Modals
+ Reusable presentation
+
+ Hooks
+
+Hooks handle:
+
+ API state
+ Loading
+ Error
+ CRUD operations
+ Pagination
+ Reusable business interaction logic
+
+ API Layer
+
+API services handle:
+
+ HTTP requests
+ Path variables
+ Query parameters
+ Headers
+ Request DTOs
+ Backend response extraction
+
+ Utilities
+
+Utilities handle:
+
+ Formatting
+ Validation
+ Error normalization
+ Response extraction
+ Common helper logic
+
+---
+
+ 10. Routing
+
+Use React Router.
+
+Create centralized route configuration.
+
+Example:
+
+text
+/
+├── /dashboard
+├── /teams
+├── /teams/create
+├── /teams/:teamId
+├── /teams/:teamId/edit
+└── ...
+
+
+Routes must be generated based on the actual modules discovered in backend-service.txt.
+
+Do not create routes for unsupported backend functionality.
+
+---
+
+ 11. Shared Components
+
+Create reusable Bootstrap-based components for:
+
+ Forms
+
+ Input
+ Select
+ Textarea
+ Number input
+ Date input
+ Checkbox
+ Radio
+ Form field wrapper
+ Validation message
+
+ Tables
+
+Create a reusable table component supporting:
+
+ Dynamic columns
+ Custom cell rendering
+ Loading state
+ Empty state
+ Responsive layout
+ Actions column
+ Pagination
+
+Example conceptual API:
+
+jsx
+<DataTable
+    columns={columns}
+    data={teams}
+    loading={loading}
+    emptyMessage="No teams found"
+/>
+
+
+ Modals
+
+Create reusable Bootstrap modal components for:
+
+ Confirmation
+ Delete confirmation
+ Details
+ Generic forms where appropriate
+
+ Feedback
+
+Create reusable:
+
+ Loading spinner
+ Error alert
+ Success alert
+ Empty state
+ Toast/notification
+
+Use Bootstrap components wherever possible.
+
+---
+
+ 12. CRUD Implementation
+
+For every backend module that supports CRUD, implement the corresponding frontend screens.
+
+Depending on available endpoints:
+
+ List
+ Create
+ View details
+ Update
+ Delete
+
+Do not implement unsupported operations.
+
+Every CRUD operation must use the exact endpoint and DTO from backend-service.txt.
+
+---
+
+ 13. Pagination
+
+For APIs returning Spring-style paginated responses, use the backend pagination information.
+
+For example:
+
+javascript
+response.data.data.content
+
+
+contains the actual records.
+
+Use:
+
+javascript
+response.data.data.totalElements
+response.data.data.totalPages
+response.data.data.number
+response.data.data.size
+response.data.data.first
+response.data.data.last
+
+
+to construct pagination UI.
+
+Do not calculate pagination incorrectly on the frontend when the backend already provides pagination metadata.
+
+The frontend page index must correctly map to the backend's expected page numbering.
+
+If backend pagination starts at:
+
+text
+page=0
+
+
+the frontend must correctly translate the Bootstrap pagination UI to the zero-based backend page.
+
+---
+
+ 14. Loading, Error and Empty States
+
+Every API-driven screen must support:
+
+ Loading
+
+Display a Bootstrap spinner or skeleton/loading state.
+
+ Error
+
+Display a clear Bootstrap alert.
+
+Use the backend response:
+
+javascript
+message
+
+
+when available.
+
+ Empty
+
+Example:
+
+text
+No teams found.
+
+
+Do not show a blank table.
+
+ Success
+
+After successful:
+
+ Create
+ Update
+ Delete
+
+display a success notification using the backend:
+
+javascript
+response.message
+
+
+when available.
+
+For example:
+
+text
+Team created successfully
+
+
+---
+
+ 15. Error Handling
+
+Centralize Axios/API error handling.
+
+Support:
+
+ HTTP errors
+ Network errors
+ Backend validation errors
+ Backend business errors
+ Unexpected response structures
+ Timeout errors
+
+If the backend returns:
+
+json
+{
+    "success": false,
+    "message": "Team not found",
+    "data": null,
+    "timestamp": "..."
+}
+
+
+display the backend message.
+
+Do not expose raw technical errors to users unless appropriate.
+
+---
+
+ 16. Validation
+
+Use the validation rules documented in backend-service.txt.
+
+Frontend validation should complement backend validation, not replace it.
+
+Examples:
+
+ Required fields
+ Minimum/maximum length
+ Numeric constraints
+ Enum values
+ Email format
+ Date constraints
+
+Do not invent validation rules if the backend documentation does not provide them.
+
+Backend validation errors must still be displayed properly.
+
+---
+
+ 17. Enums
+
+Reuse all enums defined in backend-service.txt.
+
+Do not duplicate enum values manually across multiple components.
+
+Create centralized constants where appropriate.
+
+For example:
+
+javascript
+export const STATUS = {
+    ACTIVE: "ACTIVE",
+    INACTIVE: "INACTIVE"
+};
+
+
+But only create values that actually exist in the backend.
+
+Use these constants in:
+
+ Select fields
+ Filters
+ Tables
+ Forms
+ API payloads
+
+---
+
+ 18. Environment Configuration
+
+Use environment variables for the API base URL.
+
+For Vite, use:
+
+env
+VITE_API_BASE_URL=http://localhost:8080/api
+
+
+Example:
+
+javascript
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+
+Do not hardcode backend URLs inside API services.
+
+Provide:
+
+text
+.env.example
+
+
+with the required environment variables.
+
+---
+
+ 19. Axios Client
+
+Create a centralized Axios instance.
+
+Conceptually:
+
+javascript
+const apiClient = axios.create({
+    baseURL: import.meta.env.VITE_API_BASE_URL,
+    headers: {
+        "Content-Type": "application/json"
+    }
+});
+
+
+Add interceptors only when required.
+
+Do not add authentication/token logic unless backend-service.txt specifies it.
+
+---
+
+ 20. API Services
+
+Create one API service module per backend domain/module.
+
+For example:
+
+text
+api/
+└── modules/
+    ├── teamApi.js
+    ├── userApi.js
+    ├── roleApi.js
+    └── ...
+
+
+Each API service must contain every endpoint belonging to that module.
+
+Example:
+
+javascript
+export const getTeams = (params) =>
+    apiClient.get("/teams", { params });
+
+export const getTeamById = (teamId) =>
+    apiClient.get(/teams/${teamId});
+
+export const createTeam = (payload) =>
+    apiClient.post("/teams", payload);
+
+export const updateTeam = (teamId, payload) =>
+    apiClient.put(/teams/${teamId}, payload);
+
+export const deleteTeam = (teamId) =>
+    apiClient.delete(/teams/${teamId});
+
+
+The actual endpoints must come from backend-service.txt.
+
+---
+
+ 21. Avoid Duplicate API Response Logic
+
+Create reusable response utilities.
+
+For example:
+
+javascript
+export const extractData = (response) => {
+    return response?.data?.data;
+};
+
+export const extractMessage = (response) => {
+    return response?.data?.message;
+};
+
+export const isSuccess = (response) => {
+    return response?.data?.success === true;
+};
+
+
+Adapt this to the actual application architecture.
+
+For paginated responses:
+
+javascript
+const pageData = extractData(response);
+
+const records = pageData?.content ?? [];
+
+
+Do not repeat:
+
+javascript
+response.data.data.content
+
+
+throughout dozens of components without a reason.
+
+---
+
+ 22. Correct Response Mapping
+
+When the backend returns nested response objects, preserve the structure.
+
+For example:
+
+javascript
+const response = await teamApi.getTeams(params);
+
+const page = response.data.data;
+
+setTeams(page.content);
+setTotalPages(page.totalPages);
+setTotalElements(page.totalElements);
+
+
+Do not assume the response is:
+
+javascript
+response.data.content
+
+
+because the backend uses the wrapper:
+
+text
+HTTP response
+    ↓
+backend response wrapper
+    ↓
+data
+    ↓
+Spring Page
+    ↓
+content
+
+
+---
+
+ 23. Data Refresh After CRUD
+
+After:
+
+ Create
+ Update
+ Delete
+
+ensure the relevant list/table is updated.
+
+Prefer a clean strategy such as:
+
+text
+Create
+  ↓
+Success notification
+  ↓
+Navigate back to list
+  ↓
+Reload/fetch latest data
+
+
+Do not maintain stale table data.
+
+---
+
+ 24. Search and Filters
+
+If backend-service.txt provides search/filter request parameters, implement them using reusable components.
+
+Do not create frontend-only filtering if the backend already supports server-side filtering.
+
+For server-side filtering:
+
+javascript
+apiClient.get("/teams", {
+    params: {
+        page,
+        size,
+        search
+    }
+});
+
+
+Use the exact parameter names documented in the backend.
+
+---
+
+ 25. UI Requirements
+
+The UI should be:
+
+ Clean
+ Professional
+ Enterprise-oriented
+ Responsive
+ Consistent
+ Easy to navigate
+ Easy to maintain
+
+Use Bootstrap components and utilities instead of building a custom design system unnecessarily.
+
+Use:
+
+ Cards
+ Tables
+ Forms
+ Modals
+ Alerts
+ Badges
+ Buttons
+ Pagination
+ Breadcrumbs
+ Navbar/sidebar
+
+where appropriate.
+
+Avoid excessive animations and unnecessary visual complexity.
+
+---
+
+ 26. Accessibility
+
+Use proper:
+
+ <label>
+ Form labels
+ Button text
+ ARIA attributes where needed
+ Modal accessibility
+ Keyboard-friendly controls
+ Table headers
+
+Do not rely only on icons to communicate important actions.
+
+For example:
+
+text
+Edit
+Delete
+View
+
+
+should be understandable.
+
+---
+
+ 27. Code Quality
+
+Follow these principles:
+
+ DRY
+ SOLID where applicable
+ Single responsibility
+ Reusable components
+ Reusable hooks
+ Centralized API logic
+ Centralized constants
+ No unnecessary duplication
+ Clear naming
+ Small manageable components
+ Avoid deeply nested components
+ Avoid unnecessary global state
+
+Do not introduce Redux or another state-management library unless the backend/frontend requirements genuinely justify it.
+
+---
+
+ 28. Do Not Make Backend Assumptions
+
+backend-service.txt is the single source of truth.
+
+Before implementing each screen:
+
+1. Identify the endpoint.
+2. Identify HTTP method.
+3. Identify path variables.
+4. Identify query parameters.
+5. Identify headers.
+6. Identify request DTO.
+7. Identify response DTO.
+8. Identify enums.
+9. Identify pagination.
+10. Identify validation rules.
+11. Implement frontend accordingly.
+
+If something is not documented, do not invent it.
+
+---
+
+ 29. Endpoint Coverage Requirement
+
+After implementation, create an endpoint coverage checklist.
+
+Example:
+
+text
+✓ GET    /teams
+✓ GET    /teams/{teamId}
+✓ POST   /teams
+✓ PUT    /teams/{teamId}
+✓ DELETE /teams/{teamId}
+
+
+For every endpoint in backend-service.txt, show the corresponding frontend API method.
+
+The goal is 100% endpoint coverage.
+
+---
+
+ 30. Output Order
+
+Your response MUST follow this exact order:
+
+ 1. Proposed Folder Structure
+
+Show the complete final folder structure based on the actual backend modules.
+
+ 2. Application Architecture
+
+Briefly explain:
+
+ Component architecture
+ API architecture
+ Hook architecture
+ State management
+ Response handling
+ Bootstrap usage
+
+ 3. Routing Structure
+
+Show all routes and their corresponding pages.
+
+ 4. Shared Components
+
+Explain and implement reusable:
+
+ Layouts
+ Forms
+ Inputs
+ Tables
+ Modals
+ Pagination
+ Loading
+ Error
+ Empty states
+ Notifications
+
+ 5. API Layer
+
+Show:
+
+ Axios configuration
+ Environment configuration
+ Response wrapper handling
+ API services
+ Endpoint mapping
+ Request payload handling
+ Query params
+ Path variables
+ Headers
+
+ 6. Hooks
+
+Implement reusable hooks for:
+
+ API calls
+ CRUD
+ Pagination
+ Form handling
+ Modal state
+ Other repeated behavior
+
+ 7. Page-wise Implementation
+
+For every backend module:
+
+ List page
+ Create page/form
+ Edit page/form
+ Details page
+ Delete confirmation
+ Search/filter
+ Pagination
+
+Only implement screens supported by the backend.
+
+ 8. Complete Code File-by-File
+
+Provide the actual code for every required file.
+
+Do not provide pseudocode.
+
+Do not omit important files with statements such as:
+
+text
+// remaining code
+
+
+or:
+
+text
+// implement similarly
+
+
+Every required file must contain complete runnable code.
+
+---
+
+ 31. Final Verification
+
+Before finishing, verify:
+
+ Backend Integration
+
+ [ ] Every backend endpoint has a frontend API method.
+ [ ] Every HTTP method is correct.
+ [ ] Every path variable is correctly inserted.
+ [ ] Every query parameter is correctly named.
+ [ ] Every required header is included.
+ [ ] Every request DTO matches the backend.
+ [ ] Every response DTO is mapped correctly.
+ [ ] Backend enums are reused.
+ [ ] Pagination matches backend behavior.
+
+ Response Handling
+
+ [ ] success is handled.
+ [ ] message is handled.
+ [ ] data is correctly extracted.
+ [ ] timestamp does not interfere with business data.
+ [ ] Paginated data.content is correctly displayed.
+ [ ] totalPages, totalElements, number, size, first, and last are handled correctly.
+
+ UI
+
+ [ ] Bootstrap is used as the primary styling system.
+ [ ] Custom CSS is minimal.
+ [ ] Inline CSS is avoided unless necessary.
+ [ ] Tables are responsive.
+ [ ] Forms are responsive.
+ [ ] Layout is responsive.
+ [ ] Loading states exist.
+ [ ] Error states exist.
+ [ ] Empty states exist.
+ [ ] Success notifications exist.
+ [ ] Delete confirmations exist.
+ [ ] Validation exists.
+ [ ] UI does not display incorrect or invented data.
+
+ Code Quality
+
+ [ ] No duplicated API logic.
+ [ ] No duplicated response extraction logic.
+ [ ] Reusable components are used.
+ [ ] Reusable hooks are used.
+ [ ] API services are separated from UI.
+ [ ] Constants are centralized.
+ [ ] Environment variables are used.
+ [ ] No unnecessary state-management library.
+ [ ] Code is production-ready and maintainable.
+
+---
+
+ Important Final Instruction
+
+Analyze backend-service.txt first.
+
+Do not start generating generic frontend code before understanding the backend.
+
+The backend contract has priority over all assumptions.
+
+The final React application must correctly send the expected payloads and correctly consume the actual backend response format:
+
+text
+HTTP Response
+      ↓
+{
+    success,
+    message,
+    data,
+    timestamp
+}
+      ↓
+data
+      ↓
+actual DTO / PageResponse
+      ↓
+content[] for paginated APIs
+
+
+The generated frontend must run immediately in the existing React project after installing the required dependencies and configuring .env.
+
+Use Bootstrap-first responsive UI, with minimal custom CSS and minimal inline styling, while keeping the implementation reusable, scalable, enterprise-grade, and easy to extend.
