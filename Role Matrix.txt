@@ -1,0 +1,50 @@
+| Module        | Admin   | VP        | Director | DM       | TL     | Member   |
+| ------------- | ------- | --------- | -------- | -------- | ------ | -------- |
+| Users         | C/R/U/D | R         | R        | R        | R      | Self     |
+| Teams         | C/R/U/D | R         | R        | R        | R      | -        |
+| Projects      | C/R/U/D | R         | R        | R        | R      | Read     |
+| Weekly Update | R       | R         | R        | R        | R/U    | C/R/U    |
+| Risk          | R       | R         | R        | R/U      | C/R/U  | C/R/U    |
+| Blocker       | R       | R         | R        | R/U      | C/R/U  | C/R/U    |
+| WSR Submit    | -       | -         | -        | Review   | Submit | -        |
+| WSR Approve   | -       | -         | -        | Approve  | -      | -        |
+| Dashboard     | All     | Executive | Director | Delivery | Team   | Personal |
+
+
+ADMIN:admin@wsr.com
+
+eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbkB3c3IuY29tIiwidXNlcklkIjoxLCJlbXBsb3llZUlkIjoiQURNSU4wMDEiLCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3OTAyNDkzMTEsImV4cCI6MTc5NDU2OTMxMX0.SfcQOfWDidjTrqbxpcF20HZjev-mVEadDj7-4FRcAp8
+
+
+
+VP: vp@wsr.com
+eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ2cEB3c3IuY29tIiwidXNlcklkIjoyLCJlbXBsb3llZUlkIjoiRU1QMDAxIiwicm9sZSI6IlZQIiwiaWF0IjoxNzkwMjQ5MzQzLCJleHAiOjE3OTQ1NjkzNDN9.h1jRnGNbfQpYvgHoYO8Id8iA_16-9zZs_dlyDSLi1XA
+
+Director
+
+director@wsr.com
+
+eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkaXJlY3RvckB3c3IuY29tIiwidXNlcklkIjozLCJlbXBsb3llZUlkIjoiRU1QMDAyIiwicm9sZSI6IkRJUkVDVE9SIiwiaWF0IjoxNzkwMjQ5Mzg0LCJleHAiOjE3OTQ1NjkzODR9.CeywVoB6WcmHBHOneNiN4yGouWGZw9apdbLOe1Oa66E
+
+
+Delivery Manager
+
+dm@wsr.com
+eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkbUB3c3IuY29tIiwidXNlcklkIjo0LCJlbXBsb3llZUlkIjoiRU1QMDAzIiwicm9sZSI6IkRFTElWRVJZX01BTkFHRVIiLCJpYXQiOjE3OTAyNDk0MTcsImV4cCI6MTc5NDU2OTQxN30.yhHCvCjsVv-TMdRewt9bnNVyb8TnzSYKl-6Mwfi7mr4
+
+
+Team Lead
+tl@wsr.com
+eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0bEB3c3IuY29tIiwidXNlcklkIjo1LCJlbXBsb3llZUlkIjoiRU1QMDA0Iiwicm9sZSI6IlRFQU1fTEVBRCIsImlhdCI6MTc5MDI0OTQ2MywiZXhwIjoxNzk0NTY5NDYzfQ.VUj_ZY8xU-Arpobv1HqdQMT3Rg-S7vCugrrGpBHuQhE
+
+
+
+
+Team Member :1
+eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtZW1iZXIxQHdzci5jb20iLCJ1c2VySWQiOjYsImVtcGxveWVlSWQiOiJFTVAwMDUiLCJyb2xlIjoiVEVBTV9NRU1CRVIiLCJpYXQiOjE3OTAyNDk1ODUsImV4cCI6MTc5NDU2OTU4NX0.I3mGDcbOUInFbZgKhY3sc_lXP1gsNNswgCc_IZPWaY0
+
+
+
+Team Member 2
+
+eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJtZW1iZXIyQHdzci5jb20iLCJ1c2VySWQiOjcsImVtcGxveWVlSWQiOiJFTVAwMDYiLCJyb2xlIjoiVEVBTV9NRU1CRVIiLCJpYXQiOjE3OTAyNDk2MjUsImV4cCI6MTc5NDU2OTYyNX0.GJanly_2R417qAhWGce9Tu4_eBRA85ACCRExtxcPHVo

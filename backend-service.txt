@@ -1,0 +1,1187 @@
+================================================================================
+                    BACKEND SERVICE DOCUMENTATION
+                      WSR Management Microservice
+================================================================================
+
+================================================================================
+1. ENUMS
+================================================================================
+
+Enum: ApprovalStatus
+Values: DRAFT, SUBMITTED, APPROVED, REJECTED
+
+Enum: AuditActionType
+Values: CREATE, UPDATE, DELETE, APPROVE, REJECT, LOGIN, LOGOUT
+
+Enum: BlockerSeverity
+Values: LOW, MEDIUM, HIGH, CRITICAL
+
+Enum: BlockerStatus
+Values: OPEN, IN_PROGRESS, RESOLVED
+
+Enum: CustomerConnectFrequency
+Values: DAILY, WEEKLY, BI_WEEKLY, MONTHLY, QUARTERLY
+
+Enum: DeliveryModel
+Values: ONSHORE, OFFSHORE, HYBRID
+
+Enum: NotificationType
+Values: WSR_SUBMITTED, WSR_APPROVED, WSR_REJECTED, RISK_CREATED, HIGH_RISK_CREATED, BLOCKER_CREATED, ESCALATION_TRIGGERED, PROJECT_CREATED, PROJECT_UPDATED
+
+Enum: ProjectStatus
+Values: ONGOING, ON_HOLD, TRANSITION, RAMP_UP, RAMP_DOWN, CLOSED, ACTIVE
+
+Enum: RagStatus
+Values: GREEN, AMBER, RED
+
+Enum: RiskSeverity
+Values: LOW, MEDIUM, HIGH, CRITICAL
+
+Enum: RiskStatus
+Values: OPEN, IN_PROGRESS, CLOSED
+
+Enum: RiskType
+Values: RESOURCE, ENVIRONMENT, CLIENT_DEPENDENCY, TECHNICAL, SECURITY, OPERATIONAL, DELIVERY, COMPLIANCE
+
+Enum: RoleType
+Values: ADMIN, VP, DIRECTOR, DELIVERY_MANAGER, TEAM_LEAD, TEAM_MEMBER
+
+Enum: WeeklyUpdateStatus
+Values: DRAFT, SUBMITTED, APPROVED, REJECTED
+
+================================================================================
+2. CREATE DTOs
+================================================================================
+
+DTO: UserCreateRequest
+Fields:
+- employeeId : String
+- firstName : String
+- lastName : String
+- email : String
+- phoneNumber : String
+- password : String
+- role : RoleType
+- teamId : Long
+
+DTO: TeamCreateRequest
+Fields:
+- teamName : String
+- teamLeadId : Long
+
+DTO: ProjectCreateRequest
+Fields:
+- projectCode : String
+- projectName : String
+- clientName : String
+- deliveryModel : DeliveryModel
+- vpId : Long
+- directorId : Long
+- deliveryManagerId : Long
+- teamLeadId : Long
+- teamId : Long
+- totalTeamSize : Integer
+- onshoreCount : Integer
+- offshoreCount : Integer
+- remarks : String
+
+DTO: WeeklyUpdateCreateRequest
+Fields:
+- projectId : Long
+- userId : Long
+- reportingWeek : String
+- completedActivities : String
+- plannedActivities : String
+- progressUpdate : String
+
+DTO: AchievementCreateRequest
+Fields:
+- projectId : Long
+- weeklyUpdateId : Long
+- title : String
+- description : String
+- businessImpact : String
+
+DTO: RiskCreateRequest
+Fields:
+- projectId : Long
+- title : String
+- description : String
+- riskType : RiskType
+- severity : RiskSeverity
+- probability : Integer
+- impact : Integer
+- ownerUserId : Long
+- mitigationPlan : String
+- targetDate : LocalDate
+
+DTO: BlockerCreateRequest
+Fields:
+- projectId : Long
+- ownerUserId : Long
+- severity : BlockerSeverity
+- description : String
+- raisedDate : LocalDate
+- targetResolutionDate : LocalDate
+
+DTO: CustomerConnectCreateRequest
+Fields:
+- projectId : Long
+- lastMeetingDate : LocalDate
+- nextMeetingDate : LocalDate
+- meetingFrequency : CustomerConnectFrequency
+- customerFeedback : String
+- escalationRaised : Boolean
+
+DTO: WsrReportCreateRequest
+Fields:
+- projectId : Long
+- submittedBy : Long
+- reportingWeek : LocalDate
+
+================================================================================
+3. UPDATE DTOs
+================================================================================
+
+DTO: UserUpdateRequest
+Fields:
+- firstName : String
+- lastName : String
+- email : String
+- phoneNumber : String
+- active : Boolean
+- roleId : Long
+- teamId : Long
+- managerId : Long
+
+DTO: TeamUpdateRequest
+Fields:
+- teamName : String
+- teamLeadId : Long
+
+DTO: ProjectUpdateRequest
+Fields:
+- projectName : String
+- clientName : String
+- projectStatus : ProjectStatus
+- healthOverride : Boolean
+- remarks : String
+
+DTO: WeeklyUpdateUpdateRequest
+Fields:
+- completedActivities : String
+- plannedActivities : String
+- progressUpdate : String
+
+DTO: AchievementUpdateRequest
+Fields:
+- title : String
+- description : String
+- businessImpact : String
+
+DTO: RiskUpdateRequest
+Fields:
+- title : String
+- description : String
+- severity : RiskSeverity
+- riskStatus : RiskStatus
+- probability : Integer
+- impact : Integer
+- mitigationPlan : String
+- targetDate : LocalDate
+
+DTO: BlockerUpdateRequest
+Fields:
+- description : String
+- status : BlockerStatus
+- targetResolutionDate : LocalDate
+
+DTO: CustomerConnectUpdateRequest
+Fields:
+- nextMeetingDate : LocalDate
+- meetingFrequency : CustomerConnectFrequency
+- customerFeedback : String
+- escalationRaised : Boolean
+
+DTO: WsrReportUpdateRequest
+Fields:
+- rejectionComments : String
+
+================================================================================
+4. RESPONSE DTOs
+================================================================================
+
+DTO: UserResponse
+Fields:
+- userId : Long
+- employeeId : String
+- firstName : String
+- lastName : String
+- email : String
+- phoneNumber : String
+- active : Boolean
+- role : RoleType
+- teamId : Long
+- teamName : String
+
+DTO: TeamResponse
+Fields:
+- teamId : Long
+- teamName : String
+- teamLeadId : Long
+- teamLeadName : String
+
+DTO: ProjectResponse
+Fields:
+- projectId : Long
+- projectCode : String
+- projectName : String
+- clientName : String
+- projectStatus : ProjectStatus
+- ragStatus : RagStatus
+- totalTeamSize : Integer
+- onshoreCount : Integer
+- offshoreCount : Integer
+
+DTO: WeeklyUpdateResponse
+Fields:
+- weeklyUpdateId : Long
+- projectId : Long
+- projectName : String
+- userId : Long
+- userName : String
+- reportingWeek : String
+- completedActivities : String
+- plannedActivities : String
+- progressUpdate : String
+- status : WeeklyUpdateStatus
+
+DTO: AchievementResponse
+Fields:
+- achievementId : Long
+- projectId : Long
+- weeklyUpdateId : Long
+- title : String
+- description : String
+- businessImpact : String
+
+DTO: RiskResponse
+Fields:
+- riskId : Long
+- projectId : Long
+- title : String
+- description : String
+- riskType : RiskType
+- riskStatus : RiskStatus
+- severity : RiskSeverity
+- probability : Integer
+- impact : Integer
+- riskScore : BigDecimal
+- ownerName : String
+- mitigationPlan : String
+
+DTO: BlockerResponse
+Fields:
+- blockerId : Long
+- projectId : Long
+- description : String
+- severity : BlockerSeverity
+- status : BlockerStatus
+- ownerName : String
+- raisedDate : LocalDate
+- targetResolutionDate : LocalDate
+
+DTO: CustomerConnectResponse
+Fields:
+- customerConnectId : Long
+- projectId : Long
+- lastMeetingDate : LocalDate
+- nextMeetingDate : LocalDate
+- meetingFrequency : CustomerConnectFrequency
+- customerFeedback : String
+- escalationRaised : Boolean
+
+DTO: WsrReportResponse
+Fields:
+- wsrReportId : Long
+- projectId : Long
+- projectName : String
+- reportingWeek : LocalDate
+- status : ApprovalStatus
+- submittedBy : String
+- approvedBy : String
+- rejectionComments : String
+- submissionDate : LocalDateTime
+- approvalDate : LocalDateTime
+
+DTO: AiSummaryResponse
+Fields:
+- aiSummaryId : Long
+- wsrReportId : Long
+- executiveSummary : String
+- keyHighlights : String
+- majorAchievements : String
+- topRisks : String
+- openBlockers : String
+- aiModel : String
+- generatedAt : LocalDateTime
+
+DTO: NotificationResponse
+Fields:
+- notificationId : Long
+- notificationType : NotificationType
+- title : String
+- message : String
+- readFlag : Boolean
+- createdAt : LocalDateTime
+
+DTO: LoginResponse
+Fields:
+- accessToken : String
+- tokenType : String
+- userId : Long
+- email : String
+- role : String
+
+DTO: RefreshTokenResponse
+Fields:
+- accessToken : String
+- refreshToken : String
+- tokenType : String
+
+DTO: TeamLeadDashboardResponse
+Fields:
+- assignedProjects : Long
+- openRisks : Long
+- openBlockers : Long
+- pendingWsrSubmissions : Long
+- totalTeamSize : Integer
+
+DTO: DeliveryManagerDashboardResponse
+Fields:
+- greenProjects : Long
+- amberProjects : Long
+- redProjects : Long
+- highRisks : Long
+- submissionCompliance : Double
+
+DTO: ExecutiveDashboardResponse
+Fields:
+- greenProjects : Long
+- amberProjects : Long
+- redProjects : Long
+- portfolioCapacity : Long
+- customerHealthAlerts : Long
+
+DTO: AchievementSummaryResponse
+Fields:
+- achievementId : Long
+- title : String
+- description : String
+- businessImpact : String
+
+DTO: RiskSummaryResponse
+Fields:
+- riskId : Long
+- title : String
+- description : String
+- riskType : String
+- riskStatus : String
+- severity : String
+- probability : Integer
+- impact : Integer
+- riskScore : BigDecimal
+- ownerName : String
+- mitigationPlan : String
+- targetDate : LocalDate
+
+DTO: BlockerSummaryResponse
+Fields:
+- blockerId : Long
+- description : String
+- severity : String
+- status : String
+- ownerName : String
+- raisedDate : LocalDate
+- targetResolutionDate : LocalDate
+
+DTO: CustomerConnectSummaryResponse
+Fields:
+- customerConnectId : Long
+- lastMeetingDate : LocalDate
+- nextMeetingDate : LocalDate
+- meetingFrequency : String
+- customerFeedback : String
+- escalationRaised : Boolean
+
+DTO: WsrDetailsResponse
+Fields:
+- wsrReportId : Long
+- projectId : Long
+- projectName : String
+- projectCode : String
+- reportingWeek : LocalDate
+- status : ApprovalStatus
+- submittedBy : String
+- approvedBy : String
+- submissionDate : LocalDateTime
+- approvalDate : LocalDateTime
+- rejectionComments : String
+- totalAchievements : Integer
+- totalRisks : Integer
+- totalBlockers : Integer
+- highRiskCount : Integer
+- criticalRiskCount : Integer
+- openBlockerCount : Integer
+- escalationRaisedCount : Integer
+- achievements : List<AchievementSummaryResponse>
+- risks : List<RiskSummaryResponse>
+- blockers : List<BlockerSummaryResponse>
+- customerConnects : List<CustomerConnectSummaryResponse>
+
+================================================================================
+5. CONTROLLER API MAPPING
+================================================================================
+
+Controller: AuthController
+
+POST /api/auth/login
+Path Variables: None
+Request Parameters: None
+Request Body DTO: LoginRequest
+Response DTO: LoginResponse
+Return Type: LoginResponse
+Service Method: login
+
+GET /api/auth/me
+Path Variables: None
+Request Parameters: None
+Request Body DTO: None
+Response DTO: LoginResponse
+Return Type: LoginResponse
+Service Method: getCurrentUser
+
+PUT /api/auth/change-password
+Path Variables: None
+Request Parameters: None
+Request Body DTO: ChangePasswordRequest
+Response DTO: None
+Return Type: Void
+Service Method: changePassword
+
+---
+
+Controller: UserController
+
+POST /api/users
+Path Variables: None
+Request Parameters: None
+Request Body DTO: UserCreateRequest
+Response DTO: UserResponse
+Return Type: UserResponse
+Service Method: createUser
+
+GET /api/users/{userId}
+Path Variables:
+- userId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: UserResponse
+Return Type: UserResponse
+Service Method: getUserById
+
+GET /api/users
+Path Variables: None
+Request Parameters:
+- page : int (default: 0)
+- size : int (default: 10)
+- sortBy : String (default: "userId")
+Request Body DTO: None
+Response DTO: UserResponse (Page)
+Return Type: Page<UserResponse>
+Service Method: getAllUsers
+
+PUT /api/users/{userId}
+Path Variables:
+- userId : Long
+Request Parameters: None
+Request Body DTO: UserUpdateRequest
+Response DTO: UserResponse
+Return Type: UserResponse
+Service Method: updateUser
+
+DELETE /api/users/{userId}
+Path Variables:
+- userId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: None
+Return Type: String
+Service Method: deleteUser
+
+---
+
+Controller: TeamController
+
+POST /api/teams
+Path Variables: None
+Request Parameters: None
+Request Body DTO: TeamCreateRequest
+Response DTO: TeamResponse
+Return Type: TeamResponse
+Service Method: createTeam
+
+GET /api/teams/{teamId}
+Path Variables:
+- teamId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: TeamResponse
+Return Type: TeamResponse
+Service Method: getTeamById
+
+GET /api/teams
+Path Variables: None
+Request Parameters:
+- page : int (default: 0)
+- size : int (default: 10)
+- sortBy : String (default: "teamId")
+Request Body DTO: None
+Response DTO: TeamResponse (Page)
+Return Type: Page<TeamResponse>
+Service Method: getAllTeams
+
+PUT /api/teams/{teamId}
+Path Variables:
+- teamId : Long
+Request Parameters: None
+Request Body DTO: TeamUpdateRequest
+Response DTO: TeamResponse
+Return Type: TeamResponse
+Service Method: updateTeam
+
+DELETE /api/teams/{teamId}
+Path Variables:
+- teamId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: None
+Return Type: String
+Service Method: deleteTeam
+
+---
+
+Controller: ProjectController
+
+POST /api/projects
+Path Variables: None
+Request Parameters: None
+Request Body DTO: ProjectCreateRequest
+Response DTO: ProjectResponse
+Return Type: ProjectResponse
+Service Method: createProject
+
+GET /api/projects/{projectId}
+Path Variables:
+- projectId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: ProjectResponse
+Return Type: ProjectResponse
+Service Method: getProjectById
+
+GET /api/projects
+Path Variables: None
+Request Parameters:
+- page : int (default: 0)
+- size : int (default: 10)
+- sortBy : String (default: "projectId")
+Request Body DTO: None
+Response DTO: ProjectResponse (Page)
+Return Type: Page<ProjectResponse>
+Service Method: getAllProjects
+
+GET /api/projects/search
+Path Variables: None
+Request Parameters:
+- keyword : String
+- page : int (default: 0)
+- size : int (default: 10)
+Request Body DTO: None
+Response DTO: ProjectResponse (Page)
+Return Type: Page<ProjectResponse>
+Service Method: searchProjects
+
+PUT /api/projects/{projectId}
+Path Variables:
+- projectId : Long
+Request Parameters: None
+Request Body DTO: ProjectUpdateRequest
+Response DTO: ProjectResponse
+Return Type: ProjectResponse
+Service Method: updateProject
+
+DELETE /api/projects/{projectId}
+Path Variables:
+- projectId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: None
+Return Type: String
+Service Method: deleteProject
+
+---
+
+Controller: WeeklyUpdateController
+
+POST /api/weekly-updates
+Path Variables: None
+Request Parameters: None
+Request Body DTO: WeeklyUpdateCreateRequest
+Response DTO: WeeklyUpdateResponse
+Return Type: WeeklyUpdateResponse
+Service Method: createWeeklyUpdate
+
+GET /api/weekly-updates/{weeklyUpdateId}
+Path Variables:
+- weeklyUpdateId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: WeeklyUpdateResponse
+Return Type: WeeklyUpdateResponse
+Service Method: getWeeklyUpdateById
+
+GET /api/weekly-updates/project/{projectId}
+Path Variables:
+- projectId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: WeeklyUpdateResponse (List)
+Return Type: List<WeeklyUpdateResponse>
+Service Method: getProjectUpdates
+
+PUT /api/weekly-updates/{weeklyUpdateId}
+Path Variables:
+- weeklyUpdateId : Long
+Request Parameters: None
+Request Body DTO: WeeklyUpdateUpdateRequest
+Response DTO: WeeklyUpdateResponse
+Return Type: WeeklyUpdateResponse
+Service Method: updateWeeklyUpdate
+
+DELETE /api/weekly-updates/{weeklyUpdateId}
+Path Variables:
+- weeklyUpdateId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: None
+Return Type: String
+Service Method: deleteWeeklyUpdate
+
+---
+
+Controller: AchievementController
+
+POST /api/achievements
+Path Variables: None
+Request Parameters: None
+Request Body DTO: AchievementCreateRequest
+Response DTO: AchievementResponse
+Return Type: AchievementResponse
+Service Method: createAchievement
+
+GET /api/achievements/project/{projectId}
+Path Variables:
+- projectId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: AchievementResponse (List)
+Return Type: List<AchievementResponse>
+Service Method: getProjectAchievements
+
+PUT /api/achievements/{achievementId}
+Path Variables:
+- achievementId : Long
+Request Parameters: None
+Request Body DTO: AchievementUpdateRequest
+Response DTO: AchievementResponse
+Return Type: AchievementResponse
+Service Method: updateAchievement
+
+DELETE /api/achievements/{achievementId}
+Path Variables:
+- achievementId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: None
+Return Type: String
+Service Method: deleteAchievement
+
+---
+
+Controller: RiskController
+
+POST /api/risks
+Path Variables: None
+Request Parameters: None
+Request Body DTO: RiskCreateRequest
+Response DTO: RiskResponse
+Return Type: RiskResponse
+Service Method: createRisk
+
+GET /api/risks/{riskId}
+Path Variables:
+- riskId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: RiskResponse
+Return Type: RiskResponse
+Service Method: getRiskById
+
+GET /api/risks/project/{projectId}
+Path Variables:
+- projectId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: RiskResponse (List)
+Return Type: List<RiskResponse>
+Service Method: getProjectRisks
+
+PUT /api/risks/{riskId}
+Path Variables:
+- riskId : Long
+Request Parameters: None
+Request Body DTO: RiskUpdateRequest
+Response DTO: RiskResponse
+Return Type: RiskResponse
+Service Method: updateRisk
+
+DELETE /api/risks/{riskId}
+Path Variables:
+- riskId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: None
+Return Type: String
+Service Method: deleteRisk
+
+---
+
+Controller: BlockerController
+
+POST /api/blockers
+Path Variables: None
+Request Parameters: None
+Request Body DTO: BlockerCreateRequest
+Response DTO: BlockerResponse
+Return Type: BlockerResponse
+Service Method: createBlocker
+
+GET /api/blockers/project/{projectId}
+Path Variables:
+- projectId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: BlockerResponse (List)
+Return Type: List<BlockerResponse>
+Service Method: getProjectBlockers
+
+PUT /api/blockers/{blockerId}
+Path Variables:
+- blockerId : Long
+Request Parameters: None
+Request Body DTO: BlockerUpdateRequest
+Response DTO: BlockerResponse
+Return Type: BlockerResponse
+Service Method: updateBlocker
+
+DELETE /api/blockers/{blockerId}
+Path Variables:
+- blockerId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: None
+Return Type: String
+Service Method: deleteBlocker
+
+---
+
+Controller: CustomerConnectController
+
+POST /api/customer-connects
+Path Variables: None
+Request Parameters: None
+Request Body DTO: CustomerConnectCreateRequest
+Response DTO: CustomerConnectResponse
+Return Type: CustomerConnectResponse
+Service Method: createCustomerConnect
+
+GET /api/customer-connects/project/{projectId}
+Path Variables:
+- projectId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: CustomerConnectResponse (List)
+Return Type: List<CustomerConnectResponse>
+Service Method: getProjectCustomerConnects
+
+PUT /api/customer-connects/{customerConnectId}
+Path Variables:
+- customerConnectId : Long
+Request Parameters: None
+Request Body DTO: CustomerConnectUpdateRequest
+Response DTO: CustomerConnectResponse
+Return Type: CustomerConnectResponse
+Service Method: updateCustomerConnect
+
+DELETE /api/customer-connects/{customerConnectId}
+Path Variables:
+- customerConnectId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: None
+Return Type: String
+Service Method: deleteCustomerConnect
+
+---
+
+Controller: DashboardController
+
+GET /api/dashboard/team-lead/{userId}
+Path Variables:
+- userId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: TeamLeadDashboardResponse
+Return Type: TeamLeadDashboardResponse
+Service Method: getTeamLeadDashboard
+
+GET /api/dashboard/delivery-manager/{userId}
+Path Variables:
+- userId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: DeliveryManagerDashboardResponse
+Return Type: DeliveryManagerDashboardResponse
+Service Method: getDeliveryManagerDashboard
+
+GET /api/dashboard/executive
+Path Variables: None
+Request Parameters: None
+Request Body DTO: None
+Response DTO: ExecutiveDashboardResponse
+Return Type: ExecutiveDashboardResponse
+Service Method: getExecutiveDashboard
+
+---
+
+Controller: NotificationController
+
+GET /api/notifications/user/{userId}
+Path Variables:
+- userId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: NotificationResponse (List)
+Return Type: List<NotificationResponse>
+Service Method: getUserNotifications
+
+PATCH /api/notifications/{notificationId}/read
+Path Variables:
+- notificationId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: None
+Return Type: String
+Service Method: markAsRead
+
+---
+
+Controller: WsrReportController
+
+POST /api/wsr-reports
+Path Variables: None
+Request Parameters: None
+Request Body DTO: WsrReportCreateRequest
+Response DTO: WsrReportResponse
+Return Type: WsrReportResponse
+Service Method: createReport
+
+GET /api/wsr-reports
+Path Variables: None
+Request Parameters:
+- page : int (default: 0)
+- size : int (default: 10)
+- sortBy : String (default: "wsrReportId")
+Request Body DTO: None
+Response DTO: WsrReportResponse (Page)
+Return Type: Page<WsrReportResponse>
+Service Method: getAllReports
+
+POST /api/wsr-reports/{reportId}/submit
+Path Variables:
+- reportId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: WsrReportResponse
+Return Type: WsrReportResponse
+Service Method: submitReport
+
+POST /api/wsr-reports/{reportId}/approve/{approverId}
+Path Variables:
+- reportId : Long
+- approverId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: WsrReportResponse
+Return Type: WsrReportResponse
+Service Method: approveReport
+
+POST /api/wsr-reports/{reportId}/reject/{approverId}
+Path Variables:
+- reportId : Long
+- approverId : Long
+Request Parameters:
+- comments : String
+Request Body DTO: None
+Response DTO: WsrReportResponse
+Return Type: WsrReportResponse
+Service Method: rejectReport
+
+GET /api/wsr-reports/{reportId}
+Path Variables:
+- reportId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: WsrReportResponse
+Return Type: WsrReportResponse
+Service Method: getReportById
+
+GET /api/wsr-reports/{reportId}/details
+Path Variables:
+- reportId : Long
+Request Parameters: None
+Request Body DTO: None
+Response DTO: WsrDetailsResponse
+Return Type: WsrDetailsResponse
+Service Method: getWsrDetails
+
+================================================================================
+6. DTO USAGE MATRIX
+================================================================================
+
+POST /api/auth/login
+Request DTO: LoginRequest
+Response DTO: LoginResponse
+
+GET /api/auth/me
+Request DTO: None
+Response DTO: LoginResponse
+
+PUT /api/auth/change-password
+Request DTO: ChangePasswordRequest
+Response DTO: None
+
+POST /api/users
+Request DTO: UserCreateRequest
+Response DTO: UserResponse
+
+GET /api/users/{userId}
+Request DTO: None
+Response DTO: UserResponse
+
+GET /api/users
+Request DTO: None
+Response DTO: UserResponse
+
+PUT /api/users/{userId}
+Request DTO: UserUpdateRequest
+Response DTO: UserResponse
+
+DELETE /api/users/{userId}
+Request DTO: None
+Response DTO: None
+
+POST /api/teams
+Request DTO: TeamCreateRequest
+Response DTO: TeamResponse
+
+GET /api/teams/{teamId}
+Request DTO: None
+Response DTO: TeamResponse
+
+GET /api/teams
+Request DTO: None
+Response DTO: TeamResponse
+
+PUT /api/teams/{teamId}
+Request DTO: TeamUpdateRequest
+Response DTO: TeamResponse
+
+DELETE /api/teams/{teamId}
+Request DTO: None
+Response DTO: None
+
+POST /api/projects
+Request DTO: ProjectCreateRequest
+Response DTO: ProjectResponse
+
+GET /api/projects/{projectId}
+Request DTO: None
+Response DTO: ProjectResponse
+
+GET /api/projects
+Request DTO: None
+Response DTO: ProjectResponse
+
+GET /api/projects/search
+Request DTO: None
+Response DTO: ProjectResponse
+
+PUT /api/projects/{projectId}
+Request DTO: ProjectUpdateRequest
+Response DTO: ProjectResponse
+
+DELETE /api/projects/{projectId}
+Request DTO: None
+Response DTO: None
+
+POST /api/weekly-updates
+Request DTO: WeeklyUpdateCreateRequest
+Response DTO: WeeklyUpdateResponse
+
+GET /api/weekly-updates/{weeklyUpdateId}
+Request DTO: None
+Response DTO: WeeklyUpdateResponse
+
+GET /api/weekly-updates/project/{projectId}
+Request DTO: None
+Response DTO: WeeklyUpdateResponse
+
+PUT /api/weekly-updates/{weeklyUpdateId}
+Request DTO: WeeklyUpdateUpdateRequest
+Response DTO: WeeklyUpdateResponse
+
+DELETE /api/weekly-updates/{weeklyUpdateId}
+Request DTO: None
+Response DTO: None
+
+POST /api/achievements
+Request DTO: AchievementCreateRequest
+Response DTO: AchievementResponse
+
+GET /api/achievements/project/{projectId}
+Request DTO: None
+Response DTO: AchievementResponse
+
+PUT /api/achievements/{achievementId}
+Request DTO: AchievementUpdateRequest
+Response DTO: AchievementResponse
+
+DELETE /api/achievements/{achievementId}
+Request DTO: None
+Response DTO: None
+
+POST /api/risks
+Request DTO: RiskCreateRequest
+Response DTO: RiskResponse
+
+GET /api/risks/{riskId}
+Request DTO: None
+Response DTO: RiskResponse
+
+GET /api/risks/project/{projectId}
+Request DTO: None
+Response DTO: RiskResponse
+
+PUT /api/risks/{riskId}
+Request DTO: RiskUpdateRequest
+Response DTO: RiskResponse
+
+DELETE /api/risks/{riskId}
+Request DTO: None
+Response DTO: None
+
+POST /api/blockers
+Request DTO: BlockerCreateRequest
+Response DTO: BlockerResponse
+
+GET /api/blockers/project/{projectId}
+Request DTO: None
+Response DTO: BlockerResponse
+
+PUT /api/blockers/{blockerId}
+Request DTO: BlockerUpdateRequest
+Response DTO: BlockerResponse
+
+DELETE /api/blockers/{blockerId}
+Request DTO: None
+Response DTO: None
+
+POST /api/customer-connects
+Request DTO: CustomerConnectCreateRequest
+Response DTO: CustomerConnectResponse
+
+GET /api/customer-connects/project/{projectId}
+Request DTO: None
+Response DTO: CustomerConnectResponse
+
+PUT /api/customer-connects/{customerConnectId}
+Request DTO: CustomerConnectUpdateRequest
+Response DTO: CustomerConnectResponse
+
+DELETE /api/customer-connects/{customerConnectId}
+Request DTO: None
+Response DTO: None
+
+GET /api/dashboard/team-lead/{userId}
+Request DTO: None
+Response DTO: TeamLeadDashboardResponse
+
+GET /api/dashboard/delivery-manager/{userId}
+Request DTO: None
+Response DTO: DeliveryManagerDashboardResponse
+
+GET /api/dashboard/executive
+Request DTO: None
+Response DTO: ExecutiveDashboardResponse
+
+GET /api/notifications/user/{userId}
+Request DTO: None
+Response DTO: NotificationResponse
+
+PATCH /api/notifications/{notificationId}/read
+Request DTO: None
+Response DTO: None
+
+POST /api/wsr-reports
+Request DTO: WsrReportCreateRequest
+Response DTO: WsrReportResponse
+
+GET /api/wsr-reports
+Request DTO: None
+Response DTO: WsrReportResponse
+
+POST /api/wsr-reports/{reportId}/submit
+Request DTO: None
+Response DTO: WsrReportResponse
+
+POST /api/wsr-reports/{reportId}/approve/{approverId}
+Request DTO: None
+Response DTO: WsrReportResponse
+
+POST /api/wsr-reports/{reportId}/reject/{approverId}
+Request DTO: None
+Response DTO: WsrReportResponse
+
+GET /api/wsr-reports/{reportId}
+Request DTO: None
+Response DTO: WsrReportResponse
+
+GET /api/wsr-reports/{reportId}/details
+Request DTO: None
+Response DTO: WsrDetailsResponse
+
+================================================================================
+                          END OF DOCUMENTATION
+================================================================================
