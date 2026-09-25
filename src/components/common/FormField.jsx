@@ -1,3 +1,7 @@
-export default function FormField({ label, name, value, onChange, type = 'text', required = false, options, placeholder }) {
+import UserSelect from './UserSelect'
+
+export default function FormField({ label, name, value, onChange, type = 'text', required = false, options, placeholder, userSelect = false }) {
+  const usesUserSelect = userSelect || ['userId', 'ownerUserId', 'managerId', 'teamLeadId', 'vpId', 'directorId', 'deliveryManagerId'].includes(name)
+  if (usesUserSelect) return <UserSelect label={label} name={name} value={value} onChange={onChange} required={required} />
   return <div className="mb-3"><label className="form-label" htmlFor={name}>{label}{required && ' *'}</label>{options ? <select className="form-select" id={name} name={name} value={value ?? ''} onChange={onChange} required={required}><option value="">Select {label.toLowerCase()}</option>{options.map((option) => <option value={option} key={option}>{option.replaceAll('_', ' ')}</option>)}</select> : type === 'textarea' ? <textarea className="form-control" id={name} name={name} value={value ?? ''} onChange={onChange} required={required} placeholder={placeholder} rows="3" /> : <input className="form-control" id={name} name={name} type={type} value={value ?? ''} onChange={onChange} required={required} placeholder={placeholder} />}</div>
 }
