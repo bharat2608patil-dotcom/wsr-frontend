@@ -1,0 +1,1338 @@
+# Existing WSR React Frontend — Complete CRUD, Validation, Lookup APIs, WSR Details and UI Fixes
+
+You are working on an **existing React frontend application**.
+
+Do NOT create a new React application.
+Do NOT recreate the project.
+Do NOT replace the existing architecture unnecessarily.
+
+Work directly in the current workspace and modify the existing code.
+
+Before making changes, carefully inspect:
+
+1. `backend-service.txt`
+2. `Role matrix.txt`
+3. Existing React source code
+4. Existing API/service layer
+5. Existing routes
+6. Existing components/forms
+7. Existing authentication/role handling
+8. Existing toast/notification implementation
+
+These files are the source of truth.
+
+---
+
+# 1. CRITICAL — IMPLEMENT ALL SUPPORTED CRUD FROM BACKEND CONTRACT
+
+I currently cannot see complete CRUD functionality for:
+
+* Achievements
+* Risks
+* Blockers
+* Weekly Updates
+
+First inspect `backend-service.txt` and identify the **actual supported endpoints, HTTP methods, DTOs, path variables, request bodies, response structures and enums** for these modules.
+
+Implement the complete frontend CRUD that is actually supported by the backend.
+
+For every supported operation implement:
+
+* GET/list
+* GET/details if supported
+* POST/create
+* PUT/update
+* DELETE/delete
+
+Do NOT invent endpoints.
+
+Do NOT invent request fields.
+
+Do NOT invent DTO properties.
+
+Do NOT invent enum values.
+
+Do NOT assume CRUD exists if the backend contract does not provide that operation.
+
+The backend contract is the source of truth.
+
+For each module make sure the UI has appropriate:
+
+* List/table
+* View/details
+* Create form
+* Edit form
+* Delete action
+* Loading state
+* Empty state
+* Error state
+* Success toast
+* Backend error handling
+* Confirmation before destructive actions where appropriate
+
+Respect the permissions from `Role matrix.txt`.
+
+A user must only see or execute actions that their role is allowed to perform.
+
+---
+
+# 2. ROLE MATRIX MUST CONTROL ROUTES AND ACTIONS
+
+Read `Role matrix.txt` carefully.
+
+Use it as the source of truth for frontend authorization.
+
+Check both:
+
+## Route-level access
+
+Users should not be able to access pages/routes that their role is not allowed to access.
+
+## Action-level access
+
+Inside pages, conditionally show/enable:
+
+* Create
+* Edit
+* Delete
+* Approve
+* Reject
+* Submit
+* Escalate
+* Other actions
+
+based on the role matrix.
+
+Do not simply hide buttons while allowing unauthorized actions through direct URL navigation.
+
+Frontend protection is for UX/security boundary, while backend remains authoritative.
+
+Do not invent permissions that are not present in `Role matrix.txt`.
+
+---
+
+# 3. FRONTEND VALIDATION
+
+Add proper frontend validation to all forms.
+
+Validation must match the backend DTO constraints from `backend-service.txt`.
+
+Inspect backend validation annotations/constraints if they are documented, such as:
+
+* `@NotNull`
+* `@NotBlank`
+* `@Size`
+* `@Min`
+* `@Max`
+* `@Pattern`
+* numeric constraints
+* date constraints
+* enum constraints
+
+Implement equivalent frontend validation.
+
+Examples:
+
+## Mobile number
+
+If mobile number is required to be a 10-digit Indian mobile number:
+
+* exactly 10 digits
+* numbers only
+* reject letters
+* reject spaces if backend does not allow them
+* reject shorter values
+* reject longer values
+
+Do not silently truncate invalid input.
+
+Example validation:
+
+`9876543210` → valid
+
+`987654321` → invalid
+
+`98765432101` → invalid
+
+`98765abc10` → invalid
+
+But do not hardcode this example; follow the actual backend constraint.
+
+## Required fields
+
+Show field-level validation messages.
+
+Example:
+
+* "Team is required"
+* "Manager is required"
+* "Role is required"
+
+Use the actual field requirements from the backend contract.
+
+## Size limits
+
+Implement min/max lengths wherever the backend defines them.
+
+Examples may include:
+
+* title
+* description
+* comments
+* business impact
+* mitigation plan
+* names
+* email
+* mobile number
+
+Do not invent arbitrary limits if the backend contract specifies different limits.
+
+---
+
+# 4. SHOW BACKEND ERROR MESSAGES
+
+Do NOT replace useful backend error messages with generic messages such as:
+
+"Something went wrong"
+
+when the backend provides a meaningful message.
+
+Inspect the actual API response structure.
+
+The frontend must correctly extract backend messages from responses such as:
+
+```json
+{
+  "success": false,
+  "message": "Actual backend error message",
+  "data": null,
+  "timestamp": "..."
+}
+```
+
+Display the backend's actual `message` to the user.
+
+Also handle validation errors if the backend returns field-specific errors.
+
+For example:
+
+```text
+Mobile number must be exactly 10 digits
+Team does not exist
+User already exists
+Manager is required
+```
+
+The exact backend message should be preserved whenever possible.
+
+---
+
+# 5. USER UPDATE — TEAM ID AND MANAGER ID ARE NOT WORKING
+
+Fix the User Update functionality.
+
+Currently I cannot properly update:
+
+* `teamId`
+* `managerId`
+
+Inspect the backend User Update endpoint and DTO in `backend-service.txt`.
+
+Make sure the edit form correctly loads the existing:
+
+* team
+* manager
+
+and sends their IDs in the update payload.
+
+Example:
+
+```json
+{
+  "teamId": 2,
+  "managerId": 4
+}
+```
+
+NOT:
+
+```json
+{
+  "teamId": "Digital Transformation Team",
+  "managerId": "Neha Patil"
+}
+```
+
+Do not send names where backend expects IDs.
+
+Verify the actual backend DTO before implementing.
+
+Test the complete flow:
+
+1. Open user edit.
+2. Existing team is selected.
+3. Existing manager is selected.
+4. Change team.
+5. Change manager.
+6. Submit.
+7. Inspect outgoing request.
+8. Confirm correct IDs are sent.
+9. Refresh/reload user.
+10. Confirm updated values are displayed.
+
+---
+
+# 6. ALL ID FIELDS MUST USE BACKEND LOOKUP APIs
+
+This is very important.
+
+Whenever a form requires selecting an ID, DO NOT use hardcoded IDs.
+
+Use the relevant backend GET API.
+
+Examples:
+
+* Role ID → Role API
+* Team ID → Team API
+* Manager ID → User API
+* Team Lead ID → User API
+* Director ID → User API
+* VP ID → User API
+* Owner ID → User API
+* Project ID → Project API
+* Any other foreign-key/reference ID → corresponding backend lookup API
+
+The UI should show a human-readable name.
+
+The submitted payload must contain the ID.
+
+Example:
+
+Dropdown:
+
+```text
+Neha Patil
+Sanket Kulkarni
+Rahul Verma
+```
+
+Selected:
+
+```text
+Neha Patil
+```
+
+Payload:
+
+```json
+{
+  "managerId": 4
+}
+```
+
+NOT:
+
+```json
+{
+  "managerId": "Neha Patil"
+}
+```
+
+---
+
+# 7. CREATE REUSABLE LOOKUP COMPONENTS
+
+Where appropriate, create reusable components/hooks such as:
+
+* `UserSelect`
+* `TeamSelect`
+* `RoleSelect`
+* `ProjectSelect`
+* `ManagerSelect`
+* `OwnerSelect`
+
+or a generic reusable lookup select.
+
+Do not duplicate the same lookup logic in every form.
+
+The component should:
+
+* call the correct backend API
+* display readable names
+* retain IDs internally
+* return the selected ID
+* handle loading
+* handle empty results
+* handle errors
+* support editing existing values
+* correctly handle paginated API responses
+
+For example:
+
+```text
+Display:
+Neha Patil
+
+Value:
+4
+```
+
+---
+
+# 8. IMPORTANT — DO NOT FETCH EVERY API WHEN COMPONENT LOADS
+
+Do NOT blindly fetch all APIs whenever a component/page loads.
+
+Lookup APIs and related APIs should be fetched **only when needed**.
+
+Examples:
+
+If a form contains a Team dropdown:
+
+* fetch teams when the dropdown/form actually needs them
+* do not fetch unrelated roles, projects, managers, users, etc. unnecessarily
+
+If a Manager dropdown is opened:
+
+* fetch managers only when needed
+
+If a Project dropdown is opened:
+
+* fetch projects only when needed
+
+Prefer lazy/on-demand loading for dropdown data where practical.
+
+Avoid unnecessary API calls caused by:
+
+* component mounting
+* re-rendering
+* opening unrelated pages
+* changing unrelated fields
+
+However, if data is genuinely required immediately to render the page correctly, fetching it on page load is acceptable.
+
+The requirement is:
+
+**Do not fetch every available API simply because a component mounted.**
+
+Use appropriate strategies such as:
+
+* lazy loading
+* fetch-on-open
+* caching already-fetched lookup data
+* controlled dependencies
+
+Avoid duplicate requests.
+
+---
+
+# 9. PAGINATED LOOKUP APIs
+
+If the backend lookup endpoint is paginated, correctly handle the response.
+
+Example:
+
+```json
+{
+  "success": true,
+  "data": {
+    "content": [],
+    "totalElements": 10,
+    "totalPages": 1,
+    "number": 0,
+    "size": 10
+  }
+}
+```
+
+Use:
+
+```text
+response.data.data.content
+```
+
+for the actual records.
+
+Do not assume every GET endpoint returns a simple array.
+
+Do not request an arbitrarily huge page size unless the backend contract explicitly supports it.
+
+If pagination is required, implement it correctly.
+
+---
+
+# 10. WSR DETAILS API — FIX RESPONSE MAPPING
+
+The following endpoint must display its data correctly:
+
+```text
+http://localhost:5173/wsr-reports/1/details
+```
+
+The backend response is:
+
+```json
+{
+  "success": true,
+  "message": "WSR details fetched successfully",
+  "data": {
+    "wsrReportId": 1,
+    "projectId": 1,
+    "projectName": "WSR Management System",
+    "projectCode": "WSR001",
+    "reportingWeek": "2026-09-07",
+    "status": "APPROVED",
+    "submittedBy": "Neha Patil",
+    "approvedBy": "Rahul Verma",
+    "submissionDate": null,
+    "approvalDate": "2026-09-24T18:21:28.932253",
+    "rejectionComments": "",
+    "totalAchievements": 1,
+    "totalRisks": 1,
+    "totalBlockers": 1,
+    "highRiskCount": 1,
+    "criticalRiskCount": null,
+    "openBlockerCount": 1,
+    "escalationRaisedCount": null,
+    "achievements": [
+      {
+        "achievementId": 1,
+        "title": "Completed Risk Module",
+        "description": "Implemented CRUD operations for risk management.",
+        "businessImpact": "Improved project visibility"
+      }
+    ],
+    "risks": [
+      {
+        "riskId": 1,
+        "title": "Key Resource Attrition",
+        "description": "Critical team member may leave project",
+        "riskType": "RESOURCE",
+        "riskStatus": "OPEN",
+        "severity": "HIGH",
+        "probability": 4,
+        "impact": 5,
+        "riskScore": 20.00,
+        "ownerName": "Sanket Kulkarni",
+        "mitigationPlan": "Cross training backup resources",
+        "targetDate": "2026-10-15"
+      }
+    ],
+    "blockers": [
+      {
+        "blockerId": 1,
+        "description": "API integration dependency pending",
+        "severity": "HIGH",
+        "status": "OPEN",
+        "ownerName": "Bharat Patil",
+        "raisedDate": "2026-09-21",
+        "targetResolutionDate": "2026-09-30"
+      }
+    ],
+    "customerConnects": []
+  },
+  "timestamp": "2026-09-25T18:18:03.6844102"
+}
+```
+
+IMPORTANT:
+
+This is NOT a paginated response.
+
+The actual WSR object is:
+
+```text
+response.data.data
+```
+
+The arrays are:
+
+```text
+response.data.data.achievements
+response.data.data.risks
+response.data.data.blockers
+response.data.data.customerConnects
+```
+
+Do NOT incorrectly look for:
+
+```text
+response.data.data.content
+```
+
+for this endpoint.
+
+---
+
+# 11. WSR DETAILS — DISPLAY ALL AVAILABLE INFORMATION
+
+Make the WSR details page professional and clearly structured.
+
+Display:
+
+## Report Summary
+
+* WSR Report ID
+* Project
+* Project Code
+* Reporting Week
+* Status
+* Submitted By
+* Approved By
+* Submission Date
+* Approval Date
+* Rejection Comments
+
+## Statistics
+
+* Total Achievements
+* Total Risks
+* Total Blockers
+* High Risk Count
+* Critical Risk Count
+* Open Blocker Count
+* Escalation Raised Count
+
+## Achievements
+
+For every achievement show:
+
+* Achievement ID
+* Title
+* Description
+* Business Impact
+
+Provide actions according to `Role matrix.txt`.
+
+## Risks
+
+For every risk show:
+
+* Risk ID
+* Title
+* Description
+* Risk Type
+* Risk Status
+* Severity
+* Probability
+* Impact
+* Risk Score
+* Owner
+* Mitigation Plan
+* Target Date
+
+Provide actions according to `Role matrix.txt`.
+
+## Blockers
+
+For every blocker show:
+
+* Blocker ID
+* Description
+* Severity
+* Status
+* Owner
+* Raised Date
+* Target Resolution Date
+
+Provide actions according to `Role matrix.txt`.
+
+## Customer Connects
+
+If `customerConnects` contains data, display it according to the backend DTO.
+
+If it is empty, show a professional empty state.
+
+---
+
+# 12. NULL VALUES MUST BE HANDLED CORRECTLY
+
+Do not render:
+
+```text
+null
+undefined
+NaN
+```
+
+Use a suitable display such as:
+
+```text
+N/A
+```
+
+For example:
+
+```text
+Critical Risk Count: N/A
+Escalation Raised Count: N/A
+Submission Date: N/A
+```
+
+Only convert null to `0` when zero is semantically correct for that field.
+
+Do not blindly use:
+
+```javascript
+value || 0
+```
+
+for every field.
+
+---
+
+# 13. ONE TOAST ONLY
+
+Currently the same toast is appearing twice.
+
+Find the root cause.
+
+Do not simply hide the second toast.
+
+Inspect the architecture for duplicate notifications such as:
+
+* Axios interceptor + component toast
+* API service + hook toast
+* mutation hook + page toast
+* success handler + generic response handler
+* React StrictMode causing side effects
+* duplicated API calls
+* duplicated submit handlers
+
+Choose one clear toast responsibility.
+
+Recommended architecture:
+
+```text
+API/service layer
+    ↓
+returns success/error
+    ↓
+hook/component handles user notification
+    ↓
+ONE toast
+```
+
+Do not show the same success/error toast from multiple layers.
+
+For every user operation:
+
+```text
+Create
+Update
+Delete
+Submit
+Approve
+Reject
+etc.
+```
+
+there must be at most ONE toast for the same event.
+
+Also make sure one API action does not accidentally execute twice.
+
+Do not disable React StrictMode just to hide duplicate behavior.
+
+Fix the actual cause.
+
+---
+
+# 14. TOAST CONTENT
+
+Use backend messages whenever available.
+
+Example:
+
+Backend:
+
+```json
+{
+  "success": true,
+  "message": "User updated successfully"
+}
+```
+
+Show:
+
+```text
+User updated successfully
+```
+
+Backend error:
+
+```json
+{
+  "success": false,
+  "message": "Manager does not exist"
+}
+```
+
+Show:
+
+```text
+Manager does not exist
+```
+
+Do not replace useful backend messages with generic duplicate messages.
+
+---
+
+# 15. HAMBURGER RESPONSIVE BEHAVIOR
+
+Currently the hamburger menu is visible on all screen sizes.
+
+Fix this.
+
+## Desktop
+
+On large desktop screens:
+
+* show full navigation/sidebar/navbar
+* do NOT show hamburger button
+
+## Tablet/mobile/smaller screens
+
+Show the hamburger menu when navigation collapses.
+
+The hamburger must:
+
+* open navigation
+* close navigation
+* work correctly across routes
+* not overlap content
+* be keyboard accessible
+* have appropriate `aria-label`
+* close when appropriate after navigation
+
+Prefer Bootstrap responsive utilities/components.
+
+For example, depending on the existing layout:
+
+```text
+d-lg-none
+d-none d-lg-block
+```
+
+or Bootstrap's responsive navbar/offcanvas behavior.
+
+Do not hardcode viewport detection in JavaScript unless genuinely necessary.
+
+Use CSS/Bootstrap responsive behavior where possible.
+
+---
+
+# 16. MAKE THE WEBSITE MORE PROFESSIONAL
+
+Improve the overall UI while preserving the existing architecture.
+
+Use Bootstrap-first design.
+
+Focus on:
+
+* consistent spacing
+* clean cards
+* professional tables
+* clear headings
+* badges for statuses
+* proper buttons
+* responsive forms
+* readable empty states
+* loading indicators
+* consistent error states
+* responsive modals
+* proper typography hierarchy
+* alignment
+* appropriate Bootstrap icons if already available
+
+Avoid excessive custom CSS.
+
+Avoid excessive inline styles.
+
+Reuse existing components wherever possible.
+
+Do not completely redesign the application.
+
+Make targeted improvements that make the existing application feel polished and production-ready.
+
+---
+
+# 17. FORM UX
+
+For all CRUD forms:
+
+* clear labels
+* required indicators
+* field-level validation
+* validation messages
+* proper input types
+* dropdowns for enums
+* backend lookup dropdowns for IDs
+* disabled submit while submitting
+* loading indicator where appropriate
+* preserve entered data on validation failure
+* show backend error message
+* close modal only after successful operation
+* refresh/update the affected data after successful mutation
+* avoid unnecessary full-page API reloads
+
+For delete operations:
+
+* show confirmation
+* call the correct backend DELETE endpoint
+* show backend success/error message
+* update the list without unnecessary requests
+
+---
+
+# 18. ENUM FIELDS
+
+For fields represented by backend enums:
+
+* inspect `backend-service.txt`
+* use only supported enum values
+* show readable labels in UI where appropriate
+* send exact backend enum values in request payload
+
+Example:
+
+```text
+HIGH
+MEDIUM
+LOW
+```
+
+may display as:
+
+```text
+High
+Medium
+Low
+```
+
+but payload must contain the actual backend enum.
+
+Do not invent enum values.
+
+---
+
+# 19. API RESPONSE HANDLING
+
+The application uses a response wrapper similar to:
+
+```json
+{
+  "success": true,
+  "message": "...",
+  "data": {},
+  "timestamp": "..."
+}
+```
+
+Handle this consistently.
+
+For normal responses:
+
+```text
+response.data
+```
+
+is the backend wrapper.
+
+The actual business data is:
+
+```text
+response.data.data
+```
+
+For paginated endpoints:
+
+```text
+response.data.data.content
+```
+
+For non-paginated endpoints:
+
+```text
+response.data.data
+```
+
+Do not mix these two structures.
+
+Create reusable response handling utilities if appropriate.
+
+---
+
+# 20. DO NOT FETCH UNNECESSARY DATA
+
+Audit the application for unnecessary API calls.
+
+Do not do things like:
+
+```text
+Page opens
+→ fetch users
+→ fetch teams
+→ fetch roles
+→ fetch projects
+→ fetch managers
+→ fetch directors
+→ fetch VPs
+→ fetch achievements
+→ fetch risks
+→ fetch blockers
+```
+
+unless all of those are actually required by that page.
+
+Fetch only what the current page/form needs.
+
+For lookup dropdowns, prefer lazy/on-demand loading.
+
+Avoid duplicate requests caused by:
+
+* `useEffect` dependencies
+* remounting
+* StrictMode
+* opening/closing modals
+* changing unrelated form fields
+
+If a lookup has already been fetched and is reusable, consider caching it.
+
+---
+
+# 21. IMPORTANT REACT EFFECT RULE
+
+Search the entire project for invalid patterns such as:
+
+```javascript
+useEffect(async () => {
+```
+
+This is invalid.
+
+Fix all such occurrences.
+
+Correct pattern:
+
+```javascript
+useEffect(() => {
+  const loadData = async () => {
+    // ...
+  };
+
+  loadData();
+}, []);
+```
+
+Do not return promises from `useEffect`.
+
+Also inspect dependency arrays and prevent unnecessary repeated requests.
+
+---
+
+# 22. DO NOT USE HARDCODED RELATIONSHIP IDs
+
+Search the entire project for suspicious hardcoded IDs such as:
+
+```javascript
+teamId: 1
+managerId: 4
+roleId: 2
+projectId: 1
+ownerId: 5
+```
+
+If these are being used as actual relationship values in forms, replace them with dynamically selected IDs from backend lookup APIs.
+
+Hardcoded IDs are acceptable only for:
+
+* tests
+* mock/demo data explicitly intended as mock data
+* static configuration where the backend contract requires it
+
+They must not be used for real user form submissions.
+
+---
+
+# 23. UPDATE DATA WITHOUT UNNECESSARY FULL RELOADS
+
+After a successful CRUD operation:
+
+* update local state when practical
+* or refetch only the affected resource/list
+
+Do not unnecessarily reload every API on the page.
+
+Example:
+
+Updating one user should not automatically fetch:
+
+* all projects
+* all teams
+* all roles
+* all WSR reports
+* all risks
+* all blockers
+
+unless required.
+
+---
+
+# 24. FINAL CODEBASE AUDIT
+
+After implementing everything, perform a complete codebase audit.
+
+Search for:
+
+```text
+TODO
+FIXME
+useEffect(async
+hardcoded relationship IDs
+duplicate toast calls
+console errors
+unused imports
+broken imports
+unhandled promises
+unnecessary API calls
+inline style
+```
+
+Also inspect browser/runtime errors.
+
+Fix issues directly.
+
+Do not only report them.
+
+---
+
+# 25. VERIFY EVERY CRUD FLOW
+
+Verify the implementation for:
+
+## Achievements
+
+* List
+* Create
+* View
+* Update
+* Delete
+* Permissions
+* Validation
+* Backend errors
+* Toast
+
+## Risks
+
+* List
+* Create
+* View
+* Update
+* Delete
+* Permissions
+* Validation
+* Backend errors
+* Toast
+
+## Blockers
+
+* List
+* Create
+* View
+* Update
+* Delete
+* Permissions
+* Validation
+* Backend errors
+* Toast
+
+## Weekly Updates
+
+* List
+* Create
+* View
+* Update
+* Delete
+* Permissions
+* Validation
+* Backend errors
+* Toast
+
+Only implement operations actually supported by `backend-service.txt`.
+
+---
+
+# 26. VERIFY USER CRUD
+
+Verify:
+
+* Create user
+* View user
+* Edit user
+* Delete user if supported
+* Role selection
+* Team selection
+* Manager selection
+* Any other relationship fields
+
+Specifically verify:
+
+```text
+roleId
+teamId
+managerId
+```
+
+and any other ID-based fields defined by the backend.
+
+Display names.
+
+Submit IDs.
+
+---
+
+# 27. VERIFY WSR DETAILS
+
+Open:
+
+```text
+/wsr-reports/1/details
+```
+
+Verify that the page correctly displays the supplied sample response.
+
+The page should visibly show:
+
+```text
+WSR Report ID: 1
+Project: WSR Management System
+Project Code: WSR001
+Reporting Week: 2026-09-07
+Status: APPROVED
+Submitted By: Neha Patil
+Approved By: Rahul Verma
+Submission Date: N/A
+Approval Date: 2026-09-24...
+```
+
+Statistics:
+
+```text
+Total Achievements: 1
+Total Risks: 1
+Total Blockers: 1
+High Risk Count: 1
+Critical Risk Count: N/A
+Open Blocker Count: 1
+Escalation Raised Count: N/A
+```
+
+Achievement:
+
+```text
+Completed Risk Module
+Implemented CRUD operations for risk management.
+Improved project visibility
+```
+
+Risk:
+
+```text
+Key Resource Attrition
+RESOURCE
+OPEN
+HIGH
+Probability: 4
+Impact: 5
+Risk Score: 20.00
+Owner: Sanket Kulkarni
+Mitigation Plan: Cross training backup resources
+Target Date: 2026-10-15
+```
+
+Blocker:
+
+```text
+API integration dependency pending
+HIGH
+OPEN
+Owner: Bharat Patil
+Raised Date: 2026-09-21
+Target Resolution Date: 2026-09-30
+```
+
+Customer connects:
+
+```text
+No customer connects available
+```
+
+if the array is empty.
+
+---
+
+# 28. IMPORTANT — DO NOT BREAK EXISTING FUNCTIONALITY
+
+Before changing existing components:
+
+* understand current architecture
+* reuse existing services
+* reuse existing authentication
+* reuse existing routing
+* reuse existing styling conventions
+* preserve working features
+
+Do not rewrite the entire application unnecessarily.
+
+Do not create a second API client if one already exists.
+
+Do not create duplicate authentication logic.
+
+Do not create duplicate toast systems.
+
+Do not create duplicate lookup systems.
+
+Refactor only where it improves correctness and maintainability.
+
+---
+
+# 29. IMPLEMENT, DON'T JUST EXPLAIN
+
+This is an execution task.
+
+Do not simply tell me:
+
+* what is wrong
+* what files need changes
+* what I should do manually
+
+Actually modify the files in the current workspace.
+
+After making changes:
+
+1. Run the project's existing validation/build/lint commands where available.
+2. Fix compile errors.
+3. Fix import errors.
+4. Fix runtime errors.
+5. Fix API mapping errors.
+6. Fix validation issues.
+7. Fix duplicate toast behavior.
+8. Fix responsive navigation.
+9. Re-check role permissions.
+10. Re-check backend endpoint usage.
+
+Do not create a new React project.
+
+Do not invent backend APIs.
+
+Do not invent DTOs.
+
+Do not invent enum values.
+
+Do not hardcode relationship IDs.
+
+Do not fetch every API when a component loads.
+
+Do not leave TODOs for the requirements above.
+
+The final result should be a clean, responsive, professional, production-ready frontend integrated strictly with the existing backend contract and role matrix.

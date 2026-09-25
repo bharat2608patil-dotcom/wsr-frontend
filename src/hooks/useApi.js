@@ -18,7 +18,7 @@ export const useApi = () => {
       }
       const message = messageOf(response, fallback)
       setState({ loading: false, error: '', success: message })
-      toast?.show(message, 'success')
+      if (response.config?.method !== 'get') toast?.show(message, 'success')
       return { data: unwrap(response), response }
     } catch (error) {
       const message = errorMessage(error)

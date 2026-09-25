@@ -74,6 +74,7 @@ Fields:
 - password : String
 - role : RoleType
 - teamId : Long
+- managerId : Long
 
 DTO: TeamCreateRequest
 Fields:
@@ -233,6 +234,7 @@ Fields:
 - active : Boolean
 - role : RoleType
 - teamId : Long
+- managerId : Long
 - teamName : String
 
 DTO: TeamResponse
