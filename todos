@@ -1,0 +1,8 @@
+todos:
+if user not logged in show login page if trying to reach out other endpoints redirect login
+fix error of wsrreport tabs
+in frontend should be access according Role matrix.txt
+fix the hamburger its not working on lower devices but its visible
+in account tabs show modal which will have options profile, logout after clicking profile it should show current logged in user on logout terminates session remove localstorage and redirect login
+instead simply showing success, error message on page show it as toast  
+where you want id like userid,teamleadid,directorid,vpid ,etc for now use backend GET:/api/users and in drop down show names but while building payload use id 
