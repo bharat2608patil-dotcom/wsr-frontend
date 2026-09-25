@@ -1,0 +1,64 @@
+http://localhost:5173/wsr-reports/1/details
+when hiting show this data correctly
+
+{
+    "success": true,
+    "message": "WSR details fetched successfully",
+    "data": {
+        "wsrReportId": 1,
+        "projectId": 1,
+        "projectName": "WSR Management System",
+        "projectCode": "WSR001",
+        "reportingWeek": "2026-09-07",
+        "status": "APPROVED",
+        "submittedBy": "Neha Patil",
+        "approvedBy": "Rahul Verma",
+        "submissionDate": null,
+        "approvalDate": "2026-09-24T18:21:28.932253",
+        "rejectionComments": "",
+        "totalAchievements": 1,
+        "totalRisks": 1,
+        "totalBlockers": 1,
+        "highRiskCount": 1,
+        "criticalRiskCount": null,
+        "openBlockerCount": 1,
+        "escalationRaisedCount": null,
+        "achievements": [
+            {
+                "achievementId": 1,
+                "title": "Completed Risk Module",
+                "description": "Implemented CRUD operations for risk management.",
+                "businessImpact": "Improved project visibility"
+            }
+        ],
+        "risks": [
+            {
+                "riskId": 1,
+                "title": "Key Resource Attrition",
+                "description": "Critical team member may leave project",
+                "riskType": "RESOURCE",
+                "riskStatus": "OPEN",
+                "severity": "HIGH",
+                "probability": 4,
+                "impact": 5,
+                "riskScore": 20.00,
+                "ownerName": "Sanket Kulkarni",
+                "mitigationPlan": "Cross training backup resources",
+                "targetDate": "2026-10-15"
+            }
+        ],
+        "blockers": [
+            {
+                "blockerId": 1,
+                "description": "API integration dependency pending",
+                "severity": "HIGH",
+                "status": "OPEN",
+                "ownerName": "Bharat Patil",
+                "raisedDate": "2026-09-21",
+                "targetResolutionDate": "2026-09-30"
+            }
+        ],
+        "customerConnects": []
+    },
+    "timestamp": "2026-09-25T18:18:03.6844102"
+}
